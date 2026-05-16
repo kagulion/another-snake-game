@@ -5,6 +5,7 @@ const cellSize = gameBoard.clientWidth / boardSize;
 let snake = [{ x: 10, y: 10 }];
 let food = { x: 5, y: 5 };
 let direction = { x: 0, y: 0 };
+let lastProcessedDirection = { x: 0, y: 0 };
 let score = 0;
 
 let highScore = localStorage.getItem("highScore") || 0;
@@ -12,6 +13,7 @@ document.getElementById("high-score").textContent = `High Score: ${highScore}`;
 
 // Updates the position of the snake and checks for collisions
 function update() {
+  lastProcessedDirection = direction;
   const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
   snake.unshift(head);
 
@@ -65,10 +67,18 @@ function draw() {
 
 // Generates new food at a random location
 function generateFood() {
-  food = {
-    x: Math.floor(Math.random() * boardSize),
-    y: Math.floor(Math.random() * boardSize),
-  };
+  let newFood;
+  while (true) {
+    newFood = {
+      x: Math.floor(Math.random() * boardSize),
+      y: Math.floor(Math.random() * boardSize),
+    };
+    const isOnSnake = snake.some(
+      (segment) => segment.x === newFood.x && segment.y === newFood.y
+    );
+    if (!isOnSnake) break;
+  }
+  food = newFood;
 }
 
 // Checks if the snake collides with field boundaries or with itself
@@ -89,9 +99,9 @@ function checkCollision(head) {
 function resetGame() {
   snake = [{ x: 10, y: 10 }];
   direction = { x: 0, y: 0 };
+  lastProcessedDirection = { x: 0, y: 0 };
   score = 0;
   generateFood();
-  score = 0;
   document.getElementById("current-score").textContent = `Score: ${score}`;
 }
 
@@ -99,16 +109,16 @@ function resetGame() {
 document.addEventListener("keydown", (e) => {
   switch (e.key) {
     case "ArrowUp":
-      direction = { x: 0, y: -1 };
+      if (lastProcessedDirection.y !== 1) direction = { x: 0, y: -1 };
       break;
     case "ArrowDown":
-      direction = { x: 0, y: 1 };
+      if (lastProcessedDirection.y !== -1) direction = { x: 0, y: 1 };
       break;
     case "ArrowLeft":
-      direction = { x: -1, y: 0 };
+      if (lastProcessedDirection.x !== 1) direction = { x: -1, y: 0 };
       break;
     case "ArrowRight":
-      direction = { x: 1, y: 0 };
+      if (lastProcessedDirection.x !== -1) direction = { x: 1, y: 0 };
       break;
   }
 });
