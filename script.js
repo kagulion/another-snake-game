@@ -1,6 +1,6 @@
 const gameBoard = document.getElementById("game-board");
 const boardSize = 20;
-const cellSize = gameBoard.clientWidth / boardSize;
+const cellSize = 20;
 
 let snake = [{ x: 10, y: 10 }];
 let food = { x: 5, y: 5 };
